@@ -623,8 +623,6 @@
         const tEl = document.getElementById('tpin');
         const o = oEl.value.trim();
         const t = tEl.value.trim();
-        let valid = true;
-
         oEl.classList.toggle('error', !o);
         tEl.classList.toggle('error', !t);
 
@@ -732,12 +730,23 @@
         }
 
         if (!filtered.length) {
-            list.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-icon">${q ? '🔎' : '🔒'}</div>
-                    <div class="empty-title">${q ? 'No results found' : 'No entries yet'}</div>
-                    <div class="empty-hint">${q ? `Nothing matches "${q}"` : 'Add your first TPIN entry using the form below'}</div>
-                </div>`;
+            const empty = document.createElement('div');
+            empty.className = 'empty-state';
+
+            const icon = document.createElement('div');
+            icon.className = 'empty-icon';
+            icon.textContent = q ? '🔎' : '🔒';
+
+            const title = document.createElement('div');
+            title.className = 'empty-title';
+            title.textContent = q ? 'No results found' : 'No entries yet';
+
+            const hint = document.createElement('div');
+            hint.className = 'empty-hint';
+            hint.textContent = q ? `Nothing matches "${q}"` : 'Add your first TPIN entry using the form below';
+
+            empty.append(icon, title, hint);
+            list.appendChild(empty);
             return;
         }
 
@@ -748,23 +757,63 @@
             card.setAttribute('role', 'listitem');
             card.style.animationDelay = `${idx * 40}ms`;
 
-            const safeOwner = item.owner.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            const safeDate  = (item.date || '').replace(/</g, '&lt;');
+            // Avatar
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar';
+            avatar.style.background = `linear-gradient(135deg,${c1},${c2})`;
+            avatar.setAttribute('aria-hidden', 'true');
+            avatar.textContent = initials(item.owner);
 
-            card.innerHTML = `
-                <div class="avatar" style="background:linear-gradient(135deg,${c1},${c2})" aria-hidden="true">${initials(item.owner)}</div>
-                <div class="card-info">
-                    <div class="card-name">${safeOwner}</div>
-                    <div class="card-date">${safeDate}</div>
-                </div>
-                <div class="card-actions">
-                    <div class="pin-box">
-                        <span class="pin-text" data-revealed="false">••••••</span>
-                        <button class="icon-btn" title="Show/Hide PIN" aria-label="Show PIN" onclick="toggleReveal(this.previousElementSibling, this, '${item.tpin}')">👁️</button>
-                        <button class="icon-btn copy-btn" title="Copy PIN" aria-label="Copy PIN" onclick="copyPin('${item.tpin}')">📋</button>
-                    </div>
-                    <button class="icon-btn del-btn" title="Delete entry" aria-label="Delete ${safeOwner}" onclick="confirmDelete(${item.id}, '${safeOwner}')">🗑️</button>
-                </div>`;
+            // Info
+            const cardInfo = document.createElement('div');
+            cardInfo.className = 'card-info';
+            const nameEl = document.createElement('div');
+            nameEl.className = 'card-name';
+            nameEl.textContent = item.owner;
+            const dateEl = document.createElement('div');
+            dateEl.className = 'card-date';
+            dateEl.textContent = item.date || '';
+            cardInfo.append(nameEl, dateEl);
+
+            // PIN box
+            const pinBox = document.createElement('div');
+            pinBox.className = 'pin-box';
+
+            const pinSpan = document.createElement('span');
+            pinSpan.className = 'pin-text';
+            pinSpan.dataset.revealed = 'false';
+            pinSpan.textContent = '••••••';
+
+            const revealBtn = document.createElement('button');
+            revealBtn.className = 'icon-btn';
+            revealBtn.title = 'Show/Hide PIN';
+            revealBtn.setAttribute('aria-label', 'Show PIN');
+            revealBtn.textContent = '👁️';
+            revealBtn.addEventListener('click', () => toggleReveal(pinSpan, revealBtn, item.tpin));
+
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'icon-btn copy-btn';
+            copyBtn.title = 'Copy PIN';
+            copyBtn.setAttribute('aria-label', 'Copy PIN');
+            copyBtn.textContent = '📋';
+            copyBtn.addEventListener('click', () => copyPin(item.tpin));
+
+            pinBox.append(pinSpan, revealBtn, copyBtn);
+
+            // Delete button
+            const delBtn = document.createElement('button');
+            delBtn.className = 'icon-btn del-btn';
+            delBtn.title = 'Delete entry';
+            delBtn.setAttribute('aria-label', `Delete ${item.owner}`);
+            delBtn.textContent = '🗑️';
+            delBtn.addEventListener('click', () => confirmDelete(item.id, item.owner));
+
+            // Card actions wrapper
+            const actions = document.createElement('div');
+            actions.className = 'card-actions';
+            actions.append(pinBox, delBtn);
+
+            card.append(avatar, cardInfo, actions);
             list.appendChild(card);
         });
     }
