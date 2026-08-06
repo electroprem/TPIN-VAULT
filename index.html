@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>TPIN Vault</title>
-    <meta name="theme-color" content="#020617">
+    <title>Finance Vault</title>
+    <meta name="theme-color" content="#111827">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,123 +13,581 @@
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/11528/11528763.png">
 
     <style>
-        :root { --bg: #05070a; --glass: rgba(15, 23, 42, 0.7); --accent: #00d2ff; --accent-purple: #9d50bb; --text: #f1f5f9; --text-dim: #64748b; --success: #10b981; --danger: #ef4444; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { font-family: system-ui, -apple-system, sans-serif; background-color: var(--bg); background-image: radial-gradient(at 0% 0%, rgba(0, 210, 255, 0.1) 0px, transparent 40%), radial-gradient(at 100% 100%, rgba(157, 80, 187, 0.1) 0px, transparent 40%); color: var(--text); margin: 0; min-height: 100vh; padding: env(safe-area-inset-top) 16px 160px; display: flex; flex-direction: column; align-items: center; }
-        .app { width: 100%; max-width: 480px; }
-        
-        /* Install Banner */
-        #install-banner { display: none; background: var(--glass); border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 20px; margin-bottom: 20px; backdrop-filter: blur(20px); align-items: center; justify-content: space-between; width: 100%; max-width: 480px; animation: fadeIn 0.5s ease; }
-        
-        header { padding: 20px 0; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 0.8rem; letter-spacing: 4px; text-transform: uppercase; font-weight: 900; background: linear-gradient(90deg, var(--accent), var(--accent-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .search-input { width: 100%; padding: 16px; background: var(--glass); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; color: white; margin-bottom: 24px; }
-        .card { background: var(--glass); border: 1px solid rgba(255,255,255,0.03); border-radius: 20px; padding: 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-        .tpin-trigger { font-family: monospace; background: rgba(0,0,0,0.3); color: var(--accent); padding: 10px; border-radius: 12px; cursor: pointer; min-width: 80px; text-align: center; }
-        
-        .dock { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: calc(100% - 32px); max-width: 440px; background: rgba(15, 20, 30, 0.9); backdrop-filter: blur(30px); border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 8px; display: flex; gap: 8px; z-index: 100; }
-        .dock input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 14px; color: white; flex: 1; min-width: 0; }
-        .btn-add { background: linear-gradient(135deg, var(--accent), var(--accent-purple)); color: white; border: none; border-radius: 16px; width: 54px; font-weight: bold; cursor: pointer; }
-        
-        #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: var(--success); color: white; padding: 10px 24px; border-radius: 30px; transition: 0.4s; z-index: 1000; }
-        #toast.show { transform: translateX(-50%) translateY(0); }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; } }
+        :root {
+            --bg: #070a12;
+            --glass: rgba(15, 23, 42, 0.55);
+            --glass-strong: rgba(15, 23, 42, 0.8);
+            --edge: rgba(255, 255, 255, 0.12);
+            --text: #f8fafc;
+            --text-dim: #94a3b8;
+            --accent: #60a5fa;
+            --accent-2: #a78bfa;
+            --success: #22c55e;
+            --danger: #f87171;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(1200px 500px at -10% -10%, rgba(96, 165, 250, 0.25), transparent),
+                radial-gradient(1000px 500px at 110% 110%, rgba(167, 139, 250, 0.2), transparent),
+                var(--bg);
+            padding: env(safe-area-inset-top) 16px 190px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 520px;
+        }
+
+        #install-banner,
+        .hero,
+        .search-wrap,
+        .card,
+        .composer,
+        #toast {
+            backdrop-filter: blur(18px) saturate(170%);
+            -webkit-backdrop-filter: blur(18px) saturate(170%);
+            background: var(--glass);
+            border: 1px solid var(--edge);
+            box-shadow: 0 18px 45px rgba(2, 8, 23, 0.35);
+        }
+
+        #install-banner {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 20px;
+            margin-top: 12px;
+        }
+
+        .hero {
+            margin-top: 16px;
+            border-radius: 28px;
+            padding: 20px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: 0.01em;
+        }
+
+        .logo-chip {
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: #dbeafe;
+            background: linear-gradient(135deg, rgba(96, 165, 250, 0.35), rgba(167, 139, 250, 0.32));
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 999px;
+            padding: 7px 10px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .subline,
+        .meta {
+            margin-top: 8px;
+            color: var(--text-dim);
+            font-size: 0.86rem;
+        }
+
+        .meta {
+            font-size: 0.8rem;
+            opacity: 0.95;
+        }
+
+        .search-wrap {
+            margin-top: 14px;
+            border-radius: 16px;
+            padding: 10px 14px;
+        }
+
+        .search-wrap input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            color: var(--text);
+            font-size: 0.96rem;
+        }
+
+        .search-wrap input::placeholder,
+        input::placeholder,
+        textarea::placeholder {
+            color: #8794ad;
+        }
+
+        .search-wrap input:focus,
+        input:focus,
+        select:focus,
+        textarea:focus,
+        button:focus-visible {
+            outline: none;
+        }
+
+        #vault-list {
+            margin-top: 16px;
+        }
+
+        .card {
+            border-radius: 20px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+
+        .row-top,
+        .row-main {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .row-main {
+            margin-top: 10px;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.68rem;
+            font-weight: 700;
+            border-radius: 999px;
+            padding: 5px 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(96, 165, 250, 0.22);
+            color: #e0f2fe;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .owner {
+            font-size: 1rem;
+            font-weight: 700;
+            line-height: 1.25;
+        }
+
+        .date,
+        .notes {
+            margin-top: 4px;
+            color: var(--text-dim);
+            font-size: 0.77rem;
+        }
+
+        .notes {
+            max-width: 95%;
+            word-break: break-word;
+        }
+
+        .secret-trigger {
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(2, 6, 23, 0.35);
+            color: #dbeafe;
+            border-radius: 12px;
+            min-width: 132px;
+            max-width: 230px;
+            text-align: center;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: 0.85rem;
+            padding: 10px;
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .btn-danger,
+        .btn-soft,
+        .btn-accent {
+            border: none;
+            border-radius: 12px;
+            padding: 8px 10px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-danger {
+            background: rgba(248, 113, 113, 0.18);
+            color: #fecaca;
+            border: 1px solid rgba(248, 113, 113, 0.3);
+        }
+
+        .composer {
+            position: fixed;
+            left: 50%;
+            bottom: calc(18px + env(safe-area-inset-bottom));
+            transform: translateX(-50%);
+            width: calc(100% - 20px);
+            max-width: 520px;
+            border-radius: 26px;
+            padding: 11px;
+            z-index: 30;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(15, 23, 42, 0.55);
+            color: var(--text);
+            border-radius: 13px;
+            font-size: 0.9rem;
+            padding: 11px 12px;
+        }
+
+        textarea {
+            margin-top: 8px;
+            resize: none;
+            min-height: 42px;
+            max-height: 90px;
+        }
+
+        .actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .local-note {
+            font-size: 0.72rem;
+            color: var(--text-dim);
+            line-height: 1.35;
+        }
+
+        .btn-accent {
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: white;
+            min-width: 110px;
+        }
+
+        .btn-soft {
+            background: rgba(255, 255, 255, 0.08);
+            color: #dbeafe;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        #toast {
+            position: fixed;
+            top: calc(env(safe-area-inset-top) + 16px);
+            left: 50%;
+            transform: translateX(-50%) translateY(-120px);
+            color: white;
+            border-radius: 999px;
+            padding: 10px 16px;
+            font-size: 0.8rem;
+            letter-spacing: 0.04em;
+            transition: transform .3s ease;
+            z-index: 90;
+        }
+
+        #toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .empty {
+            text-align: center;
+            color: var(--text-dim);
+            padding: 38px 20px;
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 18px;
+            font-size: 0.84rem;
+        }
+
+        @media (max-width: 430px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .secret-trigger {
+                min-width: 118px;
+            }
+
+            .actions {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .btn-accent {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
 
-<div id="toast">COPIED TO CLIPBOARD</div>
+<div id="toast">Copied to clipboard</div>
 
 <div class="app">
     <div id="install-banner">
-        <span style="font-size: 0.8rem;">Install TPIN Vault for offline access?</span>
+        <span style="font-size: 0.78rem;">Install for full offline local access?</span>
         <div style="display: flex; gap: 8px;">
-            <button onclick="this.parentElement.parentElement.style.display='none'" style="background:none; border:none; color:var(--text-dim); font-size:0.7rem;">Dismiss</button>
-            <button id="btn-install" style="background:var(--accent); border:none; padding:5px 12px; border-radius:10px; font-weight:bold; font-size:0.7rem;">Install</button>
+            <button class="btn-soft" onclick="this.parentElement.parentElement.style.display='none'">Later</button>
+            <button class="btn-accent" id="btn-install">Install</button>
         </div>
     </div>
 
-    <header>
-        <div class="logo">TPIN VAULT</div>
-        <div style="font-size: 0.6rem; color: var(--text-dim);">SECURED LOCAL</div>
-    </header>
+    <section class="hero">
+        <div class="brand">
+            <div>
+                <h1>Finance Vault</h1>
+                <div class="subline">Store TPIN, UPI IDs, PAN, Demat and finance credentials only on your device.</div>
+            </div>
+            <div class="logo-chip">LOCAL ONLY</div>
+        </div>
+        <div class="meta" id="vault-meta">0 entries · Offline ready</div>
+    </section>
 
-    <input type="text" id="search" class="search-input" placeholder="Search entries..." oninput="render()">
+    <div class="search-wrap">
+        <input type="text" id="search" placeholder="Search by type, account label or notes" oninput="render()">
+    </div>
+
     <div id="vault-list"></div>
 </div>
 
-<div class="dock">
-    <input type="text" id="owner" placeholder="Name" autocomplete="off">
-    <input type="password" id="tpin" placeholder="PIN" inputmode="numeric" maxlength="6">
-    <button class="btn-add" onclick="addItem()">+</button>
-</div>
+<section class="composer">
+    <div class="grid">
+        <select id="entryType" aria-label="Entry type">
+            <option>TPIN</option>
+            <option>UPI ID</option>
+            <option>PAN Card</option>
+            <option>Demat Account</option>
+            <option>Bank Account</option>
+            <option>Broker Client ID</option>
+            <option>Other</option>
+        </select>
+        <input type="text" id="owner" placeholder="Label / Institution" autocomplete="off" maxlength="80">
+        <input type="text" id="secret" placeholder="Secret value" autocomplete="off" maxlength="120">
+        <textarea id="notes" placeholder="Optional notes"></textarea>
+    </div>
+    <div class="actions">
+        <div class="local-note">No cloud sync. Data stays in localStorage on this phone only.</div>
+        <button class="btn-accent" onclick="addItem()">Save entry</button>
+    </div>
+</section>
 
 <script>
-    let vault = JSON.parse(localStorage.getItem('tpin_v4')) || [];
+    const STORAGE_KEY = 'finance_vault_v1';
+    const LEGACY_KEY = 'tpin_v4';
+    let vault = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     let deferredPrompt;
 
-    // --- PWA INSTALL LOGIC ---
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        // Only show if not already installed
+    migrateLegacyData();
+
+    window.addEventListener('beforeinstallprompt', (event) => {
+        event.preventDefault();
+        deferredPrompt = event;
         if (!window.matchMedia('(display-mode: standalone)').matches) {
             document.getElementById('install-banner').style.display = 'flex';
         }
     });
 
     document.getElementById('btn-install').addEventListener('click', async () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') document.getElementById('install-banner').style.display = 'none';
-            deferredPrompt = null;
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+            document.getElementById('install-banner').style.display = 'none';
         }
+        deferredPrompt = null;
     });
 
-    // --- APP LOGIC ---
-    function addItem() {
-        const o = document.getElementById('owner'), t = document.getElementById('tpin');
-        if (!o.value || !t.value) return;
-        vault.unshift({ id: Date.now(), owner: o.value.trim(), tpin: t.value.trim(), date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) });
-        o.value = ''; t.value = '';
+    function migrateLegacyData() {
+        if (vault.length) return;
+        const legacy = JSON.parse(localStorage.getItem(LEGACY_KEY)) || [];
+        if (!legacy.length) return;
+
+        vault = legacy.map(item => ({
+            id: item.id || Date.now() + Math.floor(Math.random() * 999),
+            type: 'TPIN',
+            owner: item.owner || 'Legacy Entry',
+            secret: item.tpin || '',
+            notes: 'Imported from TPIN Vault',
+            date: item.date || formatDate()
+        })).filter(entry => entry.secret);
+
         save();
     }
 
-    function deleteItem(id) {
-        if(confirm("Delete?")) { vault = vault.filter(i => i.id !== id); save(); }
+    function formatDate() {
+        return new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
     }
 
-    function handleInteraction(el, pin) {
-        navigator.clipboard.writeText(pin).then(() => {
-            const t = document.getElementById('toast');
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 2000);
+    function addItem() {
+        const typeInput = document.getElementById('entryType');
+        const ownerInput = document.getElementById('owner');
+        const secretInput = document.getElementById('secret');
+        const notesInput = document.getElementById('notes');
+
+        const type = typeInput.value.trim();
+        const owner = ownerInput.value.trim();
+        const secret = secretInput.value.trim();
+        const notes = notesInput.value.trim();
+
+        if (!owner || !secret) {
+            showToast('Label and value are required', true);
+            return;
+        }
+
+        vault.unshift({
+            id: Date.now(),
+            type,
+            owner,
+            secret,
+            notes,
+            date: formatDate()
         });
-        el.innerText = pin;
-        setTimeout(() => { el.innerText = '••••••'; }, 3000);
+
+        ownerInput.value = '';
+        secretInput.value = '';
+        notesInput.value = '';
+        save();
+        showToast('Entry saved locally');
     }
 
-    function save() { localStorage.setItem('tpin_v4', JSON.stringify(vault)); render(); }
+    function deleteItem(id) {
+        if (!confirm('Delete this entry?')) return;
+        vault = vault.filter(item => item.id !== id);
+        save();
+        showToast('Entry deleted');
+    }
+
+    function revealAndCopy(secretButton, value) {
+        navigator.clipboard.writeText(value)
+            .then(() => showToast('Copied to clipboard'))
+            .catch(() => showToast('Could not copy', true));
+
+        secretButton.textContent = value;
+        setTimeout(() => {
+            secretButton.textContent = '•••••• Tap to reveal';
+        }, 3500);
+    }
+
+    function showToast(message, isError = false) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.style.background = isError ? 'var(--danger)' : 'var(--success)';
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    function save() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(vault));
+        render();
+    }
 
     function render() {
-        const list = document.getElementById('vault-list'), q = document.getElementById('search').value.toLowerCase();
+        const list = document.getElementById('vault-list');
+        const query = document.getElementById('search').value.trim().toLowerCase();
+
         list.innerHTML = '';
-        const filtered = vault.filter(i => i.owner.toLowerCase().includes(q));
-        if(!filtered.length) { list.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-dim);">EMPTY</div>`; return; }
+
+        const filtered = vault.filter(item => {
+            const haystack = `${item.type} ${item.owner} ${item.notes || ''}`.toLowerCase();
+            return haystack.includes(query);
+        });
+
+        document.getElementById('vault-meta').textContent = `${vault.length} ${vault.length === 1 ? 'entry' : 'entries'} · Offline ready`;
+
+        if (!filtered.length) {
+            const empty = document.createElement('div');
+            empty.className = 'empty';
+            empty.textContent = vault.length ? 'No match found in your local vault.' : 'No entries yet. Add your first finance credential below.';
+            list.appendChild(empty);
+            return;
+        }
+
         filtered.forEach(item => {
-            const card = document.createElement('div');
+            const card = document.createElement('article');
             card.className = 'card';
-            card.innerHTML = `<div><div class="owner">${item.owner}</div><div style="font-size:0.7rem;color:var(--text-dim)">${item.date}</div></div>
-                <div class="tpin-trigger" onclick="handleInteraction(this, '${item.tpin}')">••••••</div>
-                <button style="background:none; border:none; cursor:pointer" onclick="deleteItem(${item.id})">🗑️</button>`;
+
+            const top = document.createElement('div');
+            top.className = 'row-top';
+
+            const left = document.createElement('div');
+            const type = document.createElement('span');
+            type.className = 'pill';
+            type.textContent = item.type || 'OTHER';
+
+            const owner = document.createElement('div');
+            owner.className = 'owner';
+            owner.textContent = item.owner || 'Untitled';
+
+            const date = document.createElement('div');
+            date.className = 'date';
+            date.textContent = item.date || '';
+
+            left.appendChild(type);
+            left.appendChild(owner);
+            left.appendChild(date);
+
+            if (item.notes) {
+                const notes = document.createElement('div');
+                notes.className = 'notes';
+                notes.textContent = item.notes;
+                left.appendChild(notes);
+            }
+
+            const del = document.createElement('button');
+            del.className = 'btn-danger';
+            del.textContent = 'Delete';
+            del.addEventListener('click', () => deleteItem(item.id));
+
+            top.appendChild(left);
+            top.appendChild(del);
+
+            const bottom = document.createElement('div');
+            bottom.className = 'row-main';
+
+            const reveal = document.createElement('button');
+            reveal.className = 'secret-trigger';
+            reveal.type = 'button';
+            reveal.textContent = '•••••• Tap to reveal';
+            reveal.addEventListener('click', () => revealAndCopy(reveal, item.secret));
+
+            bottom.appendChild(reveal);
+
+            card.appendChild(top);
+            card.appendChild(bottom);
             list.appendChild(card);
         });
     }
 
     if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js'); });
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js');
+        });
     }
+
     render();
 </script>
 </body>
