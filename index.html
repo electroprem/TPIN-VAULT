@@ -14,14 +14,14 @@
 
     <style>
         :root {
-            --bg: #070a12;
-            --glass: rgba(15, 23, 42, 0.55);
-            --glass-strong: rgba(15, 23, 42, 0.8);
-            --edge: rgba(255, 255, 255, 0.12);
+            --bg: #05070d;
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-strong: rgba(255, 255, 255, 0.14);
+            --edge: rgba(255, 255, 255, 0.25);
             --text: #f8fafc;
-            --text-dim: #94a3b8;
-            --accent: #60a5fa;
-            --accent-2: #a78bfa;
+            --text-dim: #bfd0e9;
+            --accent: #8dc4ff;
+            --accent-2: #c8b8ff;
             --success: #22c55e;
             --danger: #f87171;
         }
@@ -37,8 +37,9 @@
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
             color: var(--text);
             background:
-                radial-gradient(1200px 500px at -10% -10%, rgba(96, 165, 250, 0.25), transparent),
-                radial-gradient(1000px 500px at 110% 110%, rgba(167, 139, 250, 0.2), transparent),
+                radial-gradient(1200px 600px at -10% -10%, rgba(141, 196, 255, 0.32), transparent),
+                radial-gradient(1100px 600px at 110% 110%, rgba(200, 184, 255, 0.26), transparent),
+                radial-gradient(900px 500px at 50% 100%, rgba(255, 255, 255, 0.06), transparent),
                 var(--bg);
             padding: env(safe-area-inset-top) 16px 190px;
             display: flex;
@@ -56,11 +57,13 @@
         .card,
         .composer,
         #toast {
-            backdrop-filter: blur(18px) saturate(170%);
-            -webkit-backdrop-filter: blur(18px) saturate(170%);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
             background: var(--glass);
             border: 1px solid var(--edge);
-            box-shadow: 0 18px 45px rgba(2, 8, 23, 0.35);
+            box-shadow:
+                0 20px 45px rgba(2, 8, 23, 0.35),
+                inset 0 1px 0 rgba(255, 255, 255, 0.28);
         }
 
         #install-banner {
@@ -69,14 +72,15 @@
             justify-content: space-between;
             gap: 12px;
             padding: 12px;
-            border-radius: 20px;
+            border-radius: 22px;
             margin-top: 12px;
         }
 
         .hero {
             margin-top: 16px;
-            border-radius: 28px;
+            border-radius: 30px;
             padding: 20px;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.06));
         }
 
         .brand {
@@ -151,9 +155,10 @@
         }
 
         .card {
-            border-radius: 20px;
+            border-radius: 22px;
             padding: 14px;
             margin-bottom: 12px;
+            background: linear-gradient(155deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04));
         }
 
         .row-top,
@@ -240,9 +245,10 @@
             transform: translateX(-50%);
             width: calc(100% - 20px);
             max-width: 520px;
-            border-radius: 26px;
+            border-radius: 28px;
             padding: 11px;
             z-index: 30;
+            background: linear-gradient(160deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.06));
         }
 
         .grid {
@@ -256,7 +262,7 @@
         textarea {
             width: 100%;
             border: 1px solid rgba(255, 255, 255, 0.12);
-            background: rgba(15, 23, 42, 0.55);
+            background: rgba(6, 12, 24, 0.45);
             color: var(--text);
             border-radius: 13px;
             font-size: 0.9rem;
@@ -351,7 +357,7 @@
     <div id="install-banner">
         <span style="font-size: 0.78rem;">Install for full offline local access?</span>
         <div style="display: flex; gap: 8px;">
-            <button class="btn-soft" onclick="this.parentElement.parentElement.style.display='none'">Later</button>
+            <button class="btn-soft" id="btn-dismiss">Later</button>
             <button class="btn-accent" id="btn-install">Install</button>
         </div>
     </div>
@@ -398,9 +404,17 @@
 <script>
     const STORAGE_KEY = 'finance_vault_v1';
     const LEGACY_KEY = 'tpin_v4';
-    let vault = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    let vault = safeStorageRead(STORAGE_KEY, []);
     let deferredPrompt;
-    let pendingDeleteId = null;
+
+    function safeStorageRead(key, fallback) {
+        try {
+            const raw = localStorage.getItem(key);
+            return raw ? JSON.parse(raw) : fallback;
+        } catch {
+            return fallback;
+        }
+    }
 
     // Avatar palette – 8 gradient pairs
     const AVATARS = [
@@ -424,24 +438,57 @@
         }
     });
 
-    document.getElementById('btn-dismiss').addEventListener('click', () => {
-        document.getElementById('install-banner').style.display = 'none';
-    });
-
-    document.getElementById('btn-install').addEventListener('click', async () => {
-        if (!deferredPrompt) return;
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
+    const dismissButton = document.getElementById('btn-dismiss');
+    if (dismissButton) {
+        dismissButton.addEventListener('click', () => {
             document.getElementById('install-banner').style.display = 'none';
+        });
+    }
+
+    const installButton = document.getElementById('btn-install');
+    if (installButton) {
+        installButton.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                document.getElementById('install-banner').style.display = 'none';
+            }
+            deferredPrompt = null;
+        });
+    }
+
+    function copyText(value) {
+        if (navigator.clipboard && window.isSecureContext) {
+            return navigator.clipboard.writeText(value);
         }
-        deferredPrompt = null;
-    });
+        const field = document.createElement('textarea');
+        field.value = value;
+        field.setAttribute('readonly', '');
+        field.style.position = 'absolute';
+        field.style.left = '-9999px';
+        document.body.appendChild(field);
+        field.select();
+        const copied = document.execCommand('copy');
+        document.body.removeChild(field);
+        return copied ? Promise.resolve() : Promise.reject(new Error('copy failed'));
+    }
+
+    function revealAndCopy(secretButton, value) {
+        copyText(value)
+            .then(() => showToast('Copied to clipboard'))
+            .catch(() => showToast('Could not copy', true));
+
+        secretButton.textContent = value;
+        setTimeout(() => {
+            secretButton.textContent = '•••••• Tap to reveal';
+        }, 3500);
+    }
 
     function migrateLegacyData() {
         if (vault.length) return;
-        const legacy = JSON.parse(localStorage.getItem(LEGACY_KEY)) || [];
-        if (!legacy.length) return;
+        const legacy = safeStorageRead(LEGACY_KEY, []);
+        if (!Array.isArray(legacy) || !legacy.length) return;
 
         vault = legacy.map(item => ({
             id: item.id || Date.now() + Math.floor(Math.random() * 999),
@@ -453,10 +500,6 @@
         })).filter(entry => entry.secret);
 
         save();
-    }
-
-    function formatDate() {
-        return new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
     }
 
     function addItem() {
@@ -476,7 +519,7 @@
         }
 
         vault.unshift({
-            id: Date.now(),
+            id: Date.now() + Math.floor(Math.random() * 1000),
             type,
             owner,
             secret,
@@ -498,15 +541,13 @@
         showToast('Entry deleted');
     }
 
-    function revealAndCopy(secretButton, value) {
-        navigator.clipboard.writeText(value)
-            .then(() => showToast('Copied to clipboard'))
-            .catch(() => showToast('Could not copy', true));
+    function formatDate() {
+        return new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
 
-        secretButton.textContent = value;
-        setTimeout(() => {
-            secretButton.textContent = '•••••• Tap to reveal';
-        }, 3500);
+    function save() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(vault));
+        render();
     }
 
     function showToast(message, isError = false) {
@@ -515,11 +556,6 @@
         toast.style.background = isError ? 'var(--danger)' : 'var(--success)';
         toast.classList.add('show');
         setTimeout(() => toast.classList.remove('show'), 2000);
-    }
-
-    function save() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(vault));
-        render();
     }
 
     function render() {
@@ -598,6 +634,7 @@
             list.appendChild(card);
         });
     }
+
 
     // ── Service Worker ──
     if ('serviceWorker' in navigator) {
