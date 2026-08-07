@@ -1,11 +1,11 @@
 {
-  "name": "TPIN Vault",
-  "short_name": "TPIN",
+  "name": "Finance Vault",
+  "short_name": "Vault",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#05070a",
-  "theme_color": "#00d2ff",
-  "description": "Secure local TPIN storage",
+  "background_color": "#070a12",
+  "theme_color": "#111827",
+  "description": "Secure local storage for TPIN, UPI IDs, PAN, Demat and finance credentials.",
   "icons": [
     {
       "src": "https://cdn-icons-png.flaticon.com/512/11528/11528763.png",

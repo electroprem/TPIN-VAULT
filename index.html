@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>TPIN Vault</title>
-    <meta name="theme-color" content="#020617">
+    <title>Finance Vault</title>
+    <meta name="theme-color" content="#111827">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,521 +14,391 @@
 
     <style>
         :root {
-            --bg: #05070a;
-            --glass: rgba(15, 23, 42, 0.75);
-            --glass-hover: rgba(20, 30, 55, 0.85);
-            --accent: #00d2ff;
-            --accent-purple: #9d50bb;
-            --text: #f1f5f9;
-            --text-dim: #64748b;
-            --text-muted: #475569;
-            --success: #10b981;
-            --danger: #ef4444;
-            --danger-dim: rgba(239, 68, 68, 0.15);
-            --border: rgba(255,255,255,0.06);
-            --border-focus: rgba(0, 210, 255, 0.4);
-            --radius: 20px;
-            --radius-sm: 12px;
+            --bg: #070a12;
+            --glass: rgba(15, 23, 42, 0.55);
+            --glass-strong: rgba(15, 23, 42, 0.8);
+            --edge: rgba(255, 255, 255, 0.12);
+            --text: #f8fafc;
+            --text-dim: #94a3b8;
+            --accent: #60a5fa;
+            --accent-2: #a78bfa;
+            --success: #22c55e;
+            --danger: #f87171;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
 
         body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background-color: var(--bg);
-            background-image:
-                radial-gradient(at 0% 0%, rgba(0, 210, 255, 0.12) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(157, 80, 187, 0.12) 0px, transparent 50%),
-                radial-gradient(at 60% 40%, rgba(0, 210, 255, 0.04) 0px, transparent 40%);
-            color: var(--text);
             margin: 0;
             min-height: 100vh;
-            padding: max(env(safe-area-inset-top), 0px) 16px 180px;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(1200px 500px at -10% -10%, rgba(96, 165, 250, 0.25), transparent),
+                radial-gradient(1000px 500px at 110% 110%, rgba(167, 139, 250, 0.2), transparent),
+                var(--bg);
+            padding: env(safe-area-inset-top) 16px 190px;
             display: flex;
-            flex-direction: column;
-            align-items: center;
+            justify-content: center;
         }
 
-        .app { width: 100%; max-width: 480px; }
+        .app {
+            width: 100%;
+            max-width: 520px;
+        }
 
-        /* ── Install Banner ── */
+        #install-banner,
+        .hero,
+        .search-wrap,
+        .card,
+        .composer,
+        #toast {
+            backdrop-filter: blur(18px) saturate(170%);
+            -webkit-backdrop-filter: blur(18px) saturate(170%);
+            background: var(--glass);
+            border: 1px solid var(--edge);
+            box-shadow: 0 18px 45px rgba(2, 8, 23, 0.35);
+        }
+
         #install-banner {
             display: none;
-            background: linear-gradient(135deg, rgba(0,210,255,0.12), rgba(157,80,187,0.12));
-            border: 1px solid rgba(0,210,255,0.2);
-            padding: 14px 16px;
-            border-radius: var(--radius);
-            margin-bottom: 20px;
-            backdrop-filter: blur(20px);
             align-items: center;
             justify-content: space-between;
             gap: 12px;
-            width: 100%;
-            animation: slideDown 0.4s ease;
-        }
-        #install-banner .banner-text {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.82rem;
-            font-weight: 500;
-        }
-        #install-banner .banner-icon { font-size: 1.2rem; }
-        #install-banner .banner-actions { display: flex; gap: 8px; flex-shrink: 0; }
-        .btn-dismiss {
-            background: none;
-            border: none;
-            color: var(--text-dim);
-            font-size: 0.75rem;
-            cursor: pointer;
-            padding: 6px 10px;
-            border-radius: 8px;
-        }
-        .btn-dismiss:hover { color: var(--text); }
-        .btn-install-small {
-            background: linear-gradient(135deg, var(--accent), var(--accent-purple));
-            border: none;
-            padding: 6px 14px;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 0.75rem;
-            color: white;
-            cursor: pointer;
-        }
-
-        /* ── Header ── */
-        header {
-            padding: 24px 0 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .logo-area { display: flex; flex-direction: column; gap: 2px; }
-        .logo {
-            font-size: 1rem;
-            letter-spacing: 5px;
-            text-transform: uppercase;
-            font-weight: 900;
-            background: linear-gradient(90deg, var(--accent), var(--accent-purple));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .logo-sub { font-size: 0.6rem; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; }
-        .header-badge {
-            background: var(--glass);
-            border: 1px solid var(--border);
+            padding: 12px;
             border-radius: 20px;
-            padding: 6px 12px;
-            font-size: 0.7rem;
-            color: var(--text-dim);
+            margin-top: 12px;
+        }
+
+        .hero {
+            margin-top: 16px;
+            border-radius: 28px;
+            padding: 20px;
+        }
+
+        .brand {
             display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .header-badge .dot {
-            width: 6px; height: 6px;
-            border-radius: 50%;
-            background: var(--success);
-            box-shadow: 0 0 6px var(--success);
-        }
-
-        /* ── Search ── */
-        .search-wrap {
-            position: relative;
-            margin-bottom: 20px;
-        }
-        .search-icon {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-dim);
-            pointer-events: none;
-            font-size: 0.9rem;
-        }
-        .search-input {
-            width: 100%;
-            padding: 15px 44px 15px 44px;
-            background: var(--glass);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            color: var(--text);
-            font-size: 0.9rem;
-            transition: border-color 0.2s, background 0.2s;
-        }
-        .search-input:focus {
-            border-color: var(--border-focus);
-            background: var(--glass-hover);
-        }
-        .search-input::placeholder { color: var(--text-dim); }
-        #search-clear {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(255,255,255,0.08);
-            border: none;
-            color: var(--text-dim);
-            width: 26px; height: 26px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            transition: background 0.2s;
-        }
-        #search-clear:hover { background: rgba(255,255,255,0.15); color: var(--text); }
-        #search-clear.visible { display: flex; }
-
-        /* ── Section label ── */
-        .section-label {
-            font-size: 0.65rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            margin-bottom: 12px;
-            padding: 0 4px;
-        }
-
-        /* ── Cards ── */
-        .card {
-            background: var(--glass);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 14px 16px;
-            display: flex;
-            align-items: center;
+            align-items: flex-start;
+            justify-content: space-between;
             gap: 12px;
-            margin-bottom: 10px;
-            transition: border-color 0.2s, transform 0.15s;
-            animation: cardIn 0.35s ease both;
         }
-        .card:hover { border-color: rgba(255,255,255,0.1); }
-        .card:active { transform: scale(0.99); }
 
-        .avatar {
-            width: 42px; height: 42px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
+        .brand h1 {
+            margin: 0;
+            font-size: 1.4rem;
             font-weight: 800;
-            color: white;
-            flex-shrink: 0;
-            text-transform: uppercase;
-            letter-spacing: -0.5px;
+            letter-spacing: 0.01em;
         }
 
-        .card-info { flex: 1; min-width: 0; }
-        .card-name {
-            font-size: 0.92rem;
-            font-weight: 600;
+        .logo-chip {
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: #dbeafe;
+            background: linear-gradient(135deg, rgba(96, 165, 250, 0.35), rgba(167, 139, 250, 0.32));
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 999px;
+            padding: 7px 10px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .subline,
+        .meta {
+            margin-top: 8px;
+            color: var(--text-dim);
+            font-size: 0.86rem;
+        }
+
+        .meta {
+            font-size: 0.8rem;
+            opacity: 0.95;
+        }
+
+        .search-wrap {
+            margin-top: 14px;
+            border-radius: 16px;
+            padding: 10px 14px;
+        }
+
+        .search-wrap input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            color: var(--text);
+            font-size: 0.96rem;
+        }
+
+        .search-wrap input::placeholder,
+        input::placeholder,
+        textarea::placeholder {
+            color: #8794ad;
+        }
+
+        .search-wrap input:focus,
+        input:focus,
+        select:focus,
+        textarea:focus,
+        button:focus-visible {
+            outline: none;
+        }
+
+        #vault-list {
+            margin-top: 16px;
+        }
+
+        .card {
+            border-radius: 20px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+
+        .row-top,
+        .row-main {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .row-main {
+            margin-top: 10px;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.68rem;
+            font-weight: 700;
+            border-radius: 999px;
+            padding: 5px 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(96, 165, 250, 0.22);
+            color: #e0f2fe;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .owner {
+            font-size: 1rem;
+            font-weight: 700;
+            line-height: 1.25;
+        }
+
+        .date,
+        .notes {
+            margin-top: 4px;
+            color: var(--text-dim);
+            font-size: 0.77rem;
+        }
+
+        .notes {
+            max-width: 95%;
+            word-break: break-word;
+        }
+
+        .secret-trigger {
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(2, 6, 23, 0.35);
+            color: #dbeafe;
+            border-radius: 12px;
+            min-width: 132px;
+            max-width: 230px;
+            text-align: center;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: 0.85rem;
+            padding: 10px;
+            cursor: pointer;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            margin-bottom: 2px;
         }
-        .card-date { font-size: 0.68rem; color: var(--text-dim); }
 
-        .card-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-
-        .pin-box {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.05);
-            border-radius: var(--radius-sm);
+        .btn-danger,
+        .btn-soft,
+        .btn-accent {
+            border: none;
+            border-radius: 12px;
             padding: 8px 10px;
-        }
-        .pin-text {
-            font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
-            color: var(--accent);
-            letter-spacing: 2px;
-            min-width: 54px;
-            text-align: center;
-            user-select: none;
-        }
-        .icon-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: var(--text-dim);
-            padding: 4px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: color 0.15s, background 0.15s;
-            font-size: 0.85rem;
-        }
-        .icon-btn:hover { color: var(--text); background: rgba(255,255,255,0.08); }
-        .icon-btn.copy-btn:hover { color: var(--accent); }
-        .icon-btn.del-btn:hover { color: var(--danger); background: var(--danger-dim); }
-
-        /* ── Empty state ── */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-            animation: fadeIn 0.4s ease;
-        }
-        .empty-icon {
-            font-size: 3rem;
-            opacity: 0.4;
-            filter: grayscale(0.5);
-        }
-        .empty-title {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--text-dim);
-        }
-        .empty-hint {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            max-width: 200px;
-            line-height: 1.5;
-        }
-
-        /* ── Dock ── */
-        .dock {
-            position: fixed;
-            bottom: max(env(safe-area-inset-bottom), 20px);
-            left: 50%;
-            transform: translateX(-50%);
-            width: calc(100% - 32px);
-            max-width: 440px;
-            background: rgba(10, 15, 25, 0.95);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 26px;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            z-index: 100;
-            box-shadow: 0 -4px 40px rgba(0,0,0,0.5), 0 0 0 0.5px rgba(255,255,255,0.05);
-        }
-        .dock-fields { display: flex; gap: 8px; }
-        .dock-field {
-            position: relative;
-            flex: 1;
-            min-width: 0;
-        }
-        .dock-input {
-            width: 100%;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 16px;
-            padding: 13px 14px;
-            color: var(--text);
-            font-size: 0.9rem;
-            transition: border-color 0.2s, background 0.2s;
-        }
-        .dock-input:focus {
-            border-color: var(--border-focus);
-            background: rgba(255,255,255,0.08);
-        }
-        .dock-input::placeholder { color: var(--text-muted); }
-        .dock-input.error { border-color: rgba(239,68,68,0.5) !important; }
-
-        .pin-toggle {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: var(--text-dim);
-            cursor: pointer;
-            padding: 4px;
-            display: flex;
-            align-items: center;
-            font-size: 0.85rem;
-        }
-        #tpin { padding-right: 36px; }
-
-        .dock-row { display: flex; gap: 8px; }
-        .btn-add {
-            background: linear-gradient(135deg, var(--accent), var(--accent-purple));
-            color: white;
-            border: none;
-            border-radius: 16px;
-            height: 48px;
-            padding: 0 24px;
             font-weight: 700;
-            font-size: 0.85rem;
             cursor: pointer;
-            letter-spacing: 0.5px;
-            transition: opacity 0.2s, transform 0.1s;
+        }
+
+        .btn-danger {
+            background: rgba(248, 113, 113, 0.18);
+            color: #fecaca;
+            border: 1px solid rgba(248, 113, 113, 0.3);
+        }
+
+        .composer {
+            position: fixed;
+            left: 50%;
+            bottom: calc(18px + env(safe-area-inset-bottom));
+            transform: translateX(-50%);
+            width: calc(100% - 20px);
+            max-width: 520px;
+            border-radius: 26px;
+            padding: 11px;
+            z-index: 30;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(15, 23, 42, 0.55);
+            color: var(--text);
+            border-radius: 13px;
+            font-size: 0.9rem;
+            padding: 11px 12px;
+        }
+
+        textarea {
+            margin-top: 8px;
+            resize: none;
+            min-height: 42px;
+            max-height: 90px;
+        }
+
+        .actions {
             display: flex;
             align-items: center;
-            gap: 6px;
-            white-space: nowrap;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 8px;
         }
-        .btn-add:active { transform: scale(0.97); opacity: 0.9; }
-        .dock-hint {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            text-align: center;
-            letter-spacing: 0.5px;
-        }
-        .dock-hint span { color: var(--danger); font-weight: 600; }
 
-        /* ── Toast ── */
+        .local-note {
+            font-size: 0.72rem;
+            color: var(--text-dim);
+            line-height: 1.35;
+        }
+
+        .btn-accent {
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: white;
+            min-width: 110px;
+        }
+
+        .btn-soft {
+            background: rgba(255, 255, 255, 0.08);
+            color: #dbeafe;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
         #toast {
             position: fixed;
-            top: max(env(safe-area-inset-top), 16px);
+            top: calc(env(safe-area-inset-top) + 16px);
             left: 50%;
-            transform: translateX(-50%) translateY(calc(-100% - 20px));
-            padding: 10px 20px;
-            border-radius: 30px;
-            font-size: 0.78rem;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s;
-            z-index: 2000;
-            pointer-events: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            white-space: nowrap;
-            backdrop-filter: blur(10px);
+            transform: translateX(-50%) translateY(-120px);
+            color: white;
+            border-radius: 999px;
+            padding: 10px 16px;
+            font-size: 0.8rem;
+            letter-spacing: 0.04em;
+            transition: transform .3s ease;
+            z-index: 90;
         }
-        #toast.show { transform: translateX(-50%) translateY(0); }
-        #toast.success { background: rgba(16, 185, 129, 0.95); color: white; box-shadow: 0 4px 20px rgba(16,185,129,0.4); }
-        #toast.error   { background: rgba(239, 68, 68, 0.95);  color: white; box-shadow: 0 4px 20px rgba(239,68,68,0.4); }
 
-        /* ── Delete Modal ── */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(4px);
-            z-index: 500;
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            padding: 0 16px max(env(safe-area-inset-bottom), 20px);
-            animation: fadeIn 0.2s ease;
+        #toast.show {
+            transform: translateX(-50%) translateY(0);
         }
-        .modal-overlay.hidden { display: none; }
-        .modal-sheet {
-            background: #0f172a;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 24px 24px 20px 20px;
-            padding: 24px;
-            width: 100%;
-            max-width: 440px;
-            animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+        .empty {
             text-align: center;
+            color: var(--text-dim);
+            padding: 38px 20px;
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 18px;
+            font-size: 0.84rem;
         }
-        .modal-icon { font-size: 2.5rem; margin-bottom: 12px; }
-        .modal-title { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
-        .modal-body { font-size: 0.82rem; color: var(--text-dim); margin-bottom: 20px; }
-        .modal-actions { display: flex; gap: 10px; }
-        .btn-cancel {
-            flex: 1; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
-            color: var(--text); border-radius: 14px; padding: 14px; font-size: 0.9rem;
-            font-weight: 600; cursor: pointer; transition: background 0.2s;
-        }
-        .btn-cancel:hover { background: rgba(255,255,255,0.12); }
-        .btn-confirm-del {
-            flex: 1; background: linear-gradient(135deg, #ef4444, #b91c1c); border: none;
-            color: white; border-radius: 14px; padding: 14px; font-size: 0.9rem;
-            font-weight: 700; cursor: pointer; transition: opacity 0.2s;
-        }
-        .btn-confirm-del:hover { opacity: 0.9; }
 
-        /* ── Animations ── */
-        @keyframes fadeIn    { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes slideUp   { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes cardIn    { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 430px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
 
-        /* ── Scrollbar ── */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+            .secret-trigger {
+                min-width: 118px;
+            }
+
+            .actions {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .btn-accent {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
 
-<div id="toast" class="success" role="status" aria-live="polite"></div>
-
-<!-- Delete confirmation bottom sheet -->
-<div id="del-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-    <div class="modal-sheet">
-        <div class="modal-icon">🗑️</div>
-        <div class="modal-title" id="modal-title">Delete Entry?</div>
-        <div class="modal-body" id="modal-body">This action cannot be undone.</div>
-        <div class="modal-actions">
-            <button class="btn-cancel" id="btn-cancel">Cancel</button>
-            <button class="btn-confirm-del" id="btn-confirm-del">Delete</button>
-        </div>
-    </div>
-</div>
+<div id="toast">Copied to clipboard</div>
 
 <div class="app">
     <div id="install-banner">
-        <div class="banner-text">
-            <span class="banner-icon">⚡</span>
-            <span>Install TPIN Vault for offline access</span>
-        </div>
-        <div class="banner-actions">
-            <button class="btn-dismiss" id="btn-dismiss" aria-label="Dismiss">✕</button>
-            <button id="btn-install" class="btn-install-small">Install</button>
+        <span style="font-size: 0.78rem;">Install for full offline local access?</span>
+        <div style="display: flex; gap: 8px;">
+            <button class="btn-soft" onclick="this.parentElement.parentElement.style.display='none'">Later</button>
+            <button class="btn-accent" id="btn-install">Install</button>
         </div>
     </div>
 
-    <header>
-        <div class="logo-area">
-            <div class="logo">TPIN VAULT</div>
-            <div class="logo-sub">Secure Local Storage</div>
+    <section class="hero">
+        <div class="brand">
+            <div>
+                <h1>Finance Vault</h1>
+                <div class="subline">Store TPIN, UPI IDs, PAN, Demat and finance credentials only on your device.</div>
+            </div>
+            <div class="logo-chip">LOCAL ONLY</div>
         </div>
-        <div class="header-badge">
-            <span class="dot"></span>
-            <span id="entry-count">0 entries</span>
-        </div>
-    </header>
+        <div class="meta" id="vault-meta">0 entries · Offline ready</div>
+    </section>
 
     <div class="search-wrap">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="search" class="search-input" placeholder="Search by name…" autocomplete="off" aria-label="Search entries">
-        <button id="search-clear" class="icon-btn" aria-label="Clear search">✕</button>
+        <input type="text" id="search" placeholder="Search by type, account label or notes" oninput="render()">
     </div>
 
-    <div class="section-label" id="section-label"></div>
-    <div id="vault-list" role="list"></div>
+    <div id="vault-list"></div>
 </div>
 
-<div class="dock" role="form" aria-label="Add new entry">
-    <div class="dock-fields">
-        <div class="dock-field">
-            <input type="text" id="owner" class="dock-input" placeholder="Name" autocomplete="off" aria-label="Name" maxlength="30">
-        </div>
-        <div class="dock-field">
-            <input type="password" id="tpin" class="dock-input" placeholder="PIN" inputmode="numeric" maxlength="6" aria-label="PIN">
-            <button type="button" class="pin-toggle" id="pin-toggle" aria-label="Toggle PIN visibility">👁️</button>
-        </div>
+<section class="composer">
+    <div class="grid">
+        <select id="entryType" aria-label="Entry type">
+            <option>TPIN</option>
+            <option>UPI ID</option>
+            <option>PAN Card</option>
+            <option>Demat Account</option>
+            <option>Bank Account</option>
+            <option>Broker Client ID</option>
+            <option>Other</option>
+        </select>
+        <input type="text" id="owner" placeholder="Label / Institution" autocomplete="off" maxlength="80">
+        <input type="text" id="secret" placeholder="Secret value" autocomplete="off" maxlength="120">
+        <textarea id="notes" placeholder="Optional notes"></textarea>
     </div>
-    <div class="dock-row">
-        <button class="btn-add" id="btn-add" aria-label="Add entry">
-            <span>+</span> Add Entry
-        </button>
+    <div class="actions">
+        <div class="local-note">No cloud sync. Data stays in localStorage on this phone only.</div>
+        <button class="btn-accent" onclick="addItem()">Save entry</button>
     </div>
-</div>
+</section>
 
 <script>
-    let vault = JSON.parse(localStorage.getItem('tpin_v4')) || [];
+    const STORAGE_KEY = 'finance_vault_v1';
+    const LEGACY_KEY = 'tpin_v4';
+    let vault = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     let deferredPrompt;
     let pendingDeleteId = null;
 
@@ -544,17 +414,11 @@
         return AVATARS[idx];
     }
 
-    function initials(name) {
-        const parts = name.trim().split(/\s+/);
-        return parts.length >= 2
-            ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
-            : name.slice(0, 2).toUpperCase();
-    }
+    migrateLegacyData();
 
-    // ── PWA Install ──
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
+    window.addEventListener('beforeinstallprompt', (event) => {
+        event.preventDefault();
+        deferredPrompt = event;
         if (!window.matchMedia('(display-mode: standalone)').matches) {
             document.getElementById('install-banner').style.display = 'flex';
         }
@@ -568,275 +432,179 @@
         if (!deferredPrompt) return;
         deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') document.getElementById('install-banner').style.display = 'none';
+        if (outcome === 'accepted') {
+            document.getElementById('install-banner').style.display = 'none';
+        }
         deferredPrompt = null;
     });
 
-    // ── Toast ──
-    function showToast(msg, type = 'success') {
-        const t = document.getElementById('toast');
-        t.textContent = msg;
-        t.className = type;
-        t.classList.add('show');
-        clearTimeout(t._timer);
-        t._timer = setTimeout(() => t.classList.remove('show'), 2200);
+    function migrateLegacyData() {
+        if (vault.length) return;
+        const legacy = JSON.parse(localStorage.getItem(LEGACY_KEY)) || [];
+        if (!legacy.length) return;
+
+        vault = legacy.map(item => ({
+            id: item.id || Date.now() + Math.floor(Math.random() * 999),
+            type: 'TPIN',
+            owner: item.owner || 'Legacy Entry',
+            secret: item.tpin || '',
+            notes: 'Imported from TPIN Vault',
+            date: item.date || formatDate()
+        })).filter(entry => entry.secret);
+
+        save();
     }
 
-    // ── Delete Modal ──
-    function confirmDelete(id, name) {
-        pendingDeleteId = id;
-        document.getElementById('modal-body').textContent = `"${name}" will be permanently removed.`;
-        document.getElementById('del-modal').classList.remove('hidden');
-        document.getElementById('btn-confirm-del').focus();
+    function formatDate() {
+        return new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
     }
 
-    function closeModal() {
-        pendingDeleteId = null;
-        document.getElementById('del-modal').classList.add('hidden');
-    }
-
-    document.getElementById('btn-cancel').addEventListener('click', closeModal);
-
-    document.getElementById('btn-confirm-del').addEventListener('click', () => {
-        if (pendingDeleteId !== null) {
-            vault = vault.filter(i => i.id !== pendingDeleteId);
-            save();
-            showToast('🗑️  Entry deleted', 'error');
-        }
-        closeModal();
-    });
-
-    document.getElementById('del-modal').addEventListener('click', (e) => {
-        if (e.target === e.currentTarget) closeModal();
-    });
-
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeModal();
-    });
-
-    // ── PIN Visibility Toggle ──
-    function togglePinVisibility() {
-        const input = document.getElementById('tpin');
-        const btn = document.getElementById('pin-toggle');
-        const isHidden = input.type === 'password';
-        input.type = isHidden ? 'text' : 'password';
-        btn.textContent = isHidden ? '🙈' : '👁️';
-    }
-
-    document.getElementById('pin-toggle').addEventListener('click', togglePinVisibility);
-
-    // ── Add Entry ──
     function addItem() {
-        const oEl = document.getElementById('owner');
-        const tEl = document.getElementById('tpin');
-        const o = oEl.value.trim();
-        const t = tEl.value.trim();
-        oEl.classList.toggle('error', !o);
-        tEl.classList.toggle('error', !t);
+        const typeInput = document.getElementById('entryType');
+        const ownerInput = document.getElementById('owner');
+        const secretInput = document.getElementById('secret');
+        const notesInput = document.getElementById('notes');
 
-        if (!o || !t) {
-            if (!o) { oEl.focus(); }
-            else { tEl.focus(); }
-            showToast('⚠️  Fill in all fields', 'error');
+        const type = typeInput.value.trim();
+        const owner = ownerInput.value.trim();
+        const secret = secretInput.value.trim();
+        const notes = notesInput.value.trim();
+
+        if (!owner || !secret) {
+            showToast('Label and value are required', true);
             return;
         }
 
         vault.unshift({
             id: Date.now(),
-            owner: o,
-            tpin: t,
-            date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+            type,
+            owner,
+            secret,
+            notes,
+            date: formatDate()
         });
-        oEl.value = '';
-        tEl.value = '';
-        oEl.classList.remove('error');
-        tEl.classList.remove('error');
-        // Reset PIN field to password type
-        document.getElementById('tpin').type = 'password';
-        document.getElementById('pin-toggle').textContent = '👁️';
+
+        ownerInput.value = '';
+        secretInput.value = '';
+        notesInput.value = '';
         save();
-        showToast('✅  Entry saved');
-        if (navigator.vibrate) navigator.vibrate(40);
+        showToast('Entry saved locally');
     }
 
-    // Allow Enter key to submit from dock
-    function dockKeydown(e) {
-        if (e.key === 'Enter') addItem();
+    function deleteItem(id) {
+        if (!confirm('Delete this entry?')) return;
+        vault = vault.filter(item => item.id !== id);
+        save();
+        showToast('Entry deleted');
     }
 
-    // ── Copy PIN ──
-    function copyPin(pin) {
-        navigator.clipboard.writeText(pin).then(() => {
-            showToast('📋  PIN copied!');
-            if (navigator.vibrate) navigator.vibrate(30);
-        }).catch(() => showToast('Copy failed', 'error'));
+    function revealAndCopy(secretButton, value) {
+        navigator.clipboard.writeText(value)
+            .then(() => showToast('Copied to clipboard'))
+            .catch(() => showToast('Could not copy', true));
+
+        secretButton.textContent = value;
+        setTimeout(() => {
+            secretButton.textContent = '•••••• Tap to reveal';
+        }, 3500);
     }
 
-    // ── Toggle PIN reveal per card ──
-    function toggleReveal(spanEl, btn, pin) {
-        const revealed = spanEl.dataset.revealed === 'true';
-        if (revealed) {
-            spanEl.textContent = '••••••';
-            spanEl.dataset.revealed = 'false';
-            btn.textContent = '👁️';
-            btn.setAttribute('aria-label', 'Show PIN');
-        } else {
-            spanEl.textContent = pin;
-            spanEl.dataset.revealed = 'true';
-            btn.textContent = '🙈';
-            btn.setAttribute('aria-label', 'Hide PIN');
-            setTimeout(() => {
-                if (spanEl.dataset.revealed === 'true') {
-                    spanEl.textContent = '••••••';
-                    spanEl.dataset.revealed = 'false';
-                    btn.textContent = '👁️';
-                }
-            }, 5000);
-        }
+    function showToast(message, isError = false) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.style.background = isError ? 'var(--danger)' : 'var(--success)';
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
     }
 
-    // ── Search ──
-    function onSearch() {
-        const val = document.getElementById('search').value;
-        const clearBtn = document.getElementById('search-clear');
-        clearBtn.classList.toggle('visible', val.length > 0);
-        render();
-    }
-
-    function clearSearch() {
-        document.getElementById('search').value = '';
-        document.getElementById('search-clear').classList.remove('visible');
-        render();
-        document.getElementById('search').focus();
-    }
-
-    // ── Save & Render ──
     function save() {
-        localStorage.setItem('tpin_v4', JSON.stringify(vault));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(vault));
         render();
     }
 
     function render() {
         const list = document.getElementById('vault-list');
-        const q = document.getElementById('search').value.toLowerCase().trim();
+        const query = document.getElementById('search').value.trim().toLowerCase();
+
         list.innerHTML = '';
 
-        const filtered = vault.filter(i => i.owner.toLowerCase().includes(q));
+        const filtered = vault.filter(item => {
+            const haystack = `${item.type} ${item.owner} ${item.notes || ''}`.toLowerCase();
+            return haystack.includes(query);
+        });
 
-        // Update header count
-        const countEl = document.getElementById('entry-count');
-        countEl.textContent = vault.length === 1 ? '1 entry' : `${vault.length} entries`;
-
-        // Section label
-        const labelEl = document.getElementById('section-label');
-        if (filtered.length) {
-            labelEl.textContent = q
-                ? `${filtered.length} result${filtered.length !== 1 ? 's' : ''} for "${q}"`
-                : `${filtered.length} stored ${filtered.length === 1 ? 'entry' : 'entries'}`;
-        } else {
-            labelEl.textContent = '';
-        }
+        document.getElementById('vault-meta').textContent = `${vault.length} ${vault.length === 1 ? 'entry' : 'entries'} · Offline ready`;
 
         if (!filtered.length) {
             const empty = document.createElement('div');
-            empty.className = 'empty-state';
-
-            const icon = document.createElement('div');
-            icon.className = 'empty-icon';
-            icon.textContent = q ? '🔎' : '🔒';
-
-            const title = document.createElement('div');
-            title.className = 'empty-title';
-            title.textContent = q ? 'No results found' : 'No entries yet';
-
-            const hint = document.createElement('div');
-            hint.className = 'empty-hint';
-            hint.textContent = q ? `Nothing matches "${q}"` : 'Add your first TPIN entry using the form below';
-
-            empty.append(icon, title, hint);
+            empty.className = 'empty';
+            empty.textContent = vault.length ? 'No match found in your local vault.' : 'No entries yet. Add your first finance credential below.';
             list.appendChild(empty);
             return;
         }
 
-        filtered.forEach((item, idx) => {
-            const [c1, c2] = avatarGrad(item.owner);
-            const card = document.createElement('div');
+        filtered.forEach(item => {
+            const card = document.createElement('article');
             card.className = 'card';
-            card.setAttribute('role', 'listitem');
-            card.style.animationDelay = `${idx * 40}ms`;
 
-            // Avatar
-            const avatar = document.createElement('div');
-            avatar.className = 'avatar';
-            avatar.style.background = `linear-gradient(135deg,${c1},${c2})`;
-            avatar.setAttribute('aria-hidden', 'true');
-            avatar.textContent = initials(item.owner);
+            const top = document.createElement('div');
+            top.className = 'row-top';
 
-            // Info
-            const cardInfo = document.createElement('div');
-            cardInfo.className = 'card-info';
-            const nameEl = document.createElement('div');
-            nameEl.className = 'card-name';
-            nameEl.textContent = item.owner;
-            const dateEl = document.createElement('div');
-            dateEl.className = 'card-date';
-            dateEl.textContent = item.date || '';
-            cardInfo.append(nameEl, dateEl);
+            const left = document.createElement('div');
+            const type = document.createElement('span');
+            type.className = 'pill';
+            type.textContent = item.type || 'OTHER';
 
-            // PIN box
-            const pinBox = document.createElement('div');
-            pinBox.className = 'pin-box';
+            const owner = document.createElement('div');
+            owner.className = 'owner';
+            owner.textContent = item.owner || 'Untitled';
 
-            const pinSpan = document.createElement('span');
-            pinSpan.className = 'pin-text';
-            pinSpan.dataset.revealed = 'false';
-            pinSpan.textContent = '••••••';
+            const date = document.createElement('div');
+            date.className = 'date';
+            date.textContent = item.date || '';
 
-            const revealBtn = document.createElement('button');
-            revealBtn.className = 'icon-btn';
-            revealBtn.title = 'Show/Hide PIN';
-            revealBtn.setAttribute('aria-label', 'Show PIN');
-            revealBtn.textContent = '👁️';
-            revealBtn.addEventListener('click', () => toggleReveal(pinSpan, revealBtn, item.tpin));
+            left.appendChild(type);
+            left.appendChild(owner);
+            left.appendChild(date);
 
-            const copyBtn = document.createElement('button');
-            copyBtn.className = 'icon-btn copy-btn';
-            copyBtn.title = 'Copy PIN';
-            copyBtn.setAttribute('aria-label', 'Copy PIN');
-            copyBtn.textContent = '📋';
-            copyBtn.addEventListener('click', () => copyPin(item.tpin));
+            if (item.notes) {
+                const notes = document.createElement('div');
+                notes.className = 'notes';
+                notes.textContent = item.notes;
+                left.appendChild(notes);
+            }
 
-            pinBox.append(pinSpan, revealBtn, copyBtn);
+            const del = document.createElement('button');
+            del.className = 'btn-danger';
+            del.textContent = 'Delete';
+            del.addEventListener('click', () => deleteItem(item.id));
 
-            // Delete button
-            const delBtn = document.createElement('button');
-            delBtn.className = 'icon-btn del-btn';
-            delBtn.title = 'Delete entry';
-            delBtn.setAttribute('aria-label', `Delete ${item.owner}`);
-            delBtn.textContent = '🗑️';
-            delBtn.addEventListener('click', () => confirmDelete(item.id, item.owner));
+            top.appendChild(left);
+            top.appendChild(del);
 
-            // Card actions wrapper
-            const actions = document.createElement('div');
-            actions.className = 'card-actions';
-            actions.append(pinBox, delBtn);
+            const bottom = document.createElement('div');
+            bottom.className = 'row-main';
 
-            card.append(avatar, cardInfo, actions);
+            const reveal = document.createElement('button');
+            reveal.className = 'secret-trigger';
+            reveal.type = 'button';
+            reveal.textContent = '•••••• Tap to reveal';
+            reveal.addEventListener('click', () => revealAndCopy(reveal, item.secret));
+
+            bottom.appendChild(reveal);
+
+            card.appendChild(top);
+            card.appendChild(bottom);
             list.appendChild(card);
         });
     }
 
     // ── Service Worker ──
     if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js'); });
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js');
+        });
     }
-
-    // ── Wire up remaining static element handlers ──
-    document.getElementById('search').addEventListener('input', onSearch);
-    document.getElementById('search-clear').addEventListener('click', clearSearch);
-    document.getElementById('owner').addEventListener('keydown', dockKeydown);
-    document.getElementById('tpin').addEventListener('keydown', dockKeydown);
-    document.getElementById('btn-add').addEventListener('click', addItem);
 
     render();
 </script>
